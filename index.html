@@ -1026,31 +1026,55 @@
             // Calculate all scores before sending
             const pillarScores = calculateAllScores();
             
-            // Collect all assessment data
+            // Submit to Google Form
+            const formData = new FormData();
+            
+            // Add form fields with your actual field IDs
+            formData.append('entry.1300327790', firstName); // First Name
+            formData.append('entry.499399112', email); // Email
+            formData.append('entry.1389817547', pillarScores.overall); // Overall Score
+            formData.append('entry.712844336', pillarScores.leadership); // Leadership Score
+            formData.append('entry.379965506', pillarScores.performance); // Performance Score
+            formData.append('entry.1423329043', pillarScores.talent); // Talent Score
+            formData.append('entry.2029081751', pillarScores.operational); // Operational Score
+            formData.append('entry.249721741', pillarScores.customer); // Customer Score
+            formData.append('entry.2051656793', pillarScores.scalable); // Scalable Score
+            formData.append('entry.939533081', pillarScores.aiReadiness); // AI Readiness Score
+            formData.append('entry.2141778735', pillarScores.businessImpact); // Business Impact Score
+            formData.append('entry.454668559', responses.size || ''); // Company Size
+            formData.append('entry.1609927747', responses.phase || ''); // Business Phase
+            formData.append('entry.1031471426', JSON.stringify(responses.challenges || [])); // Challenges
+            formData.append('entry.547311289', JSON.stringify(responses)); // All Responses
+            
+            // Submit to Google Form
+            fetch('https://docs.google.com/forms/d/e/1FAIpQLSeYNEbJ4empE3OkNjZFaH_44a8TzJd6-zd_lzyqq-PdDtBjjg/formResponse', {
+                method: 'POST',
+                body: formData,
+                mode: 'no-cors'
+            }).then(() => {
+                console.log('Data submitted to Google Form');
+            }).catch(error => {
+                console.log('Form submission completed');
+            });
+            
+            // Also log to console for debugging
             const assessmentData = {
                 timestamp: new Date().toISOString(),
-                contactInfo: { 
-                    firstName: firstName, 
-                    email: email 
-                },
+                contactInfo: { firstName, email },
                 scores: pillarScores,
                 responses: responses,
                 contextData: {
                     companySize: responses.size || '',
                     businessPhase: responses.phase || '',
                     challenges: responses.challenges || []
-                },
-                completedSections: Object.keys(responses)
+                }
             };
-            
-            // Log the data for now (instead of sending to webhook)
             console.log('Complete Assessment Data:', assessmentData);
             
             // Calculate results for display
             calculateResults();
             
-            // Show success message and proceed
-            alert(`Thank you, ${firstName}! Your results are ready.`);
+            // Go directly to results page
             showPage(totalPages);
             
             return false;
