@@ -385,7 +385,7 @@
                 <div style="background: linear-gradient(135deg, #ff3131, #e02828); color: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center;">
                     <h3 style="margin-bottom: 15px; color: white;">Ready to take action?</h3>
                     <p style="margin-bottom: 20px;">Schedule a 30-minute Culture Strategy Conversation to review your results and explore how to turn these insights into measurable business improvements.</p>
-                    <button class="btn" style="background: white; color: #ff3131; padding: 12px 24px; font-weight: 600;" onclick="window.open('#', '_blank')">Schedule Strategy Call</button>
+                    <button class="btn" style="background: white; color: #ff3131; padding: 12px 24px; font-weight: 600;" onclick="window.open('https://zcal.co/futureready/30min', '_blank')">Schedule Strategy Call</button>
                 </div>
             </div>
         </div>
@@ -1029,22 +1029,22 @@
             // Submit to Google Form
             const formData = new FormData();
             
-            // Add form fields with your actual field IDs
+            // Add form fields with your actual field IDs - sending clean values only
             formData.append('entry.1300327790', firstName); // First Name
             formData.append('entry.499399112', email); // Email
-            formData.append('entry.1389817547', pillarScores.overall); // Overall Score
-            formData.append('entry.712844336', pillarScores.leadership); // Leadership Score
-            formData.append('entry.379965506', pillarScores.performance); // Performance Score
-            formData.append('entry.1423329043', pillarScores.talent); // Talent Score
-            formData.append('entry.2029081751', pillarScores.operational); // Operational Score
-            formData.append('entry.249721741', pillarScores.customer); // Customer Score
-            formData.append('entry.2051656793', pillarScores.scalable); // Scalable Score
-            formData.append('entry.939533081', pillarScores.aiReadiness); // AI Readiness Score
-            formData.append('entry.2141778735', pillarScores.businessImpact); // Business Impact Score
+            formData.append('entry.1389817547', pillarScores.overall.toString()); // Overall Score
+            formData.append('entry.712844336', pillarScores.leadership.toString()); // Leadership Score
+            formData.append('entry.379965506', pillarScores.performance.toString()); // Performance Score
+            formData.append('entry.1423329043', pillarScores.talent.toString()); // Talent Score
+            formData.append('entry.2029081751', pillarScores.operational.toString()); // Operational Score
+            formData.append('entry.249721741', pillarScores.customer.toString()); // Customer Score
+            formData.append('entry.2051656793', pillarScores.scalable.toString()); // Scalable Score
+            formData.append('entry.939533081', pillarScores.aiReadiness.toString()); // AI Readiness Score
+            formData.append('entry.2141778735', pillarScores.businessImpact.toString()); // Business Impact Score
             formData.append('entry.454668559', responses.size || ''); // Company Size
             formData.append('entry.1609927747', responses.phase || ''); // Business Phase
-            formData.append('entry.1031471426', JSON.stringify(responses.challenges || [])); // Challenges
-            formData.append('entry.547311289', JSON.stringify(responses)); // All Responses
+            formData.append('entry.1031471426', (responses.challenges || []).join(', ')); // Challenges (comma-separated)
+            formData.append('entry.547311289', `Timestamp: ${new Date().toISOString()}, Total Questions Answered: ${Object.keys(responses).length}`); // Summary instead of raw JSON
             
             // Submit to Google Form
             fetch('https://docs.google.com/forms/d/e/1FAIpQLSeYNEbJ4empE3OkNjZFaH_44a8TzJd6-zd_lzyqq-PdDtBjjg/formResponse', {
