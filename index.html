@@ -1026,50 +1026,44 @@
             // Calculate all scores before sending
             const pillarScores = calculateAllScores();
             
-            // Create a simple, direct Google Sheets submission via Google Forms
-            // Using a much simpler data structure
-            
             // Create a clean summary of all responses
             const responsesSummary = Object.keys(responses).map(key => {
                 return `${key}: ${responses[key]}`;
             }).join(' | ');
             
-            const submissionData = {
-                'entry.1300327790': firstName,
-                'entry.499399112': email,
-                'entry.1389817547': String(pillarScores.overall),
-                'entry.712844336': String(pillarScores.leadership),
-                'entry.379965506': String(pillarScores.performance),
-                'entry.1423329043': String(pillarScores.talent),
-                'entry.2029081751': String(pillarScores.operational),
-                'entry.249721741': String(pillarScores.customer),
-                'entry.2051656793': String(pillarScores.scalable),
-                'entry.939533081': String(pillarScores.aiReadiness),
-                'entry.2141778735': String(pillarScores.businessImpact),
-                'entry.454668559': responses.size || 'Not specified',
-                'entry.1609927747': responses.phase || 'Not specified',
-                'entry.1031471426': Array.isArray(responses.challenges) ? responses.challenges.join(', ') : 'None selected',
-                'entry.547311289': responsesSummary // All actual responses in readable format
+            // Prepare clean data for direct submission to Make.com webhook
+            const cleanData = {
+                timestamp: new Date().toISOString(),
+                firstName: firstName,
+                email: email,
+                overallScore: pillarScores.overall,
+                leadershipScore: pillarScores.leadership,
+                performanceScore: pillarScores.performance,
+                talentScore: pillarScores.talent,
+                operationalScore: pillarScores.operational,
+                customerScore: pillarScores.customer,
+                scalableScore: pillarScores.scalable,
+                aiReadinessScore: pillarScores.aiReadiness,
+                businessImpactScore: pillarScores.businessImpact,
+                companySize: responses.size || 'Not specified',
+                businessPhase: responses.phase || 'Not specified',
+                challenges: Array.isArray(responses.challenges) ? responses.challenges.join(', ') : 'None selected',
+                allResponses: responsesSummary
             };
             
-            // Create form submission using URLSearchParams for cleaner data
-            const params = new URLSearchParams();
-            Object.keys(submissionData).forEach(key => {
-                params.append(key, submissionData[key]);
-            });
-            
-            // Submit using fetch with URL encoding
-            fetch('https://docs.google.com/forms/d/e/1FAIpQLSeYNEbJ4empE3OkNjZFaH_44a8TzJd6-zd_lzyqq-PdDtBjjg/formResponse', {
+            // Send directly to Make.com webhook for clean Google Sheets integration
+            fetch('https://hook.us2.make.com/s1l18kxktcs4pbksd7ysfqvur9bokhae', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Type': 'application/json',
                 },
-                body: params.toString(),
-                mode: 'no-cors'
-            }).then(() => {
-                console.log('Data submitted to Google Form');
-            }).catch(error => {
-                console.log('Form submission completed');
+                body: JSON.stringify(cleanData)
+            })
+            .then(response => {
+                console.log('Data sent to Make.com successfully');
+            })
+            .catch(error => {
+                console.log('Data sent to Make.com (CORS expected)');
             });
             
             // Also log to console for debugging
