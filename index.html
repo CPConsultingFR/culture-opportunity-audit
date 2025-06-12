@@ -1026,30 +1026,45 @@
             // Calculate all scores before sending
             const pillarScores = calculateAllScores();
             
-            // Submit to Google Form
-            const formData = new FormData();
+            // Create a simple, direct Google Sheets submission via Google Forms
+            // Using a much simpler data structure
             
-            // Add form fields with your actual field IDs - sending clean values only
-            formData.append('entry.1300327790', firstName); // First Name
-            formData.append('entry.499399112', email); // Email
-            formData.append('entry.1389817547', pillarScores.overall.toString()); // Overall Score
-            formData.append('entry.712844336', pillarScores.leadership.toString()); // Leadership Score
-            formData.append('entry.379965506', pillarScores.performance.toString()); // Performance Score
-            formData.append('entry.1423329043', pillarScores.talent.toString()); // Talent Score
-            formData.append('entry.2029081751', pillarScores.operational.toString()); // Operational Score
-            formData.append('entry.249721741', pillarScores.customer.toString()); // Customer Score
-            formData.append('entry.2051656793', pillarScores.scalable.toString()); // Scalable Score
-            formData.append('entry.939533081', pillarScores.aiReadiness.toString()); // AI Readiness Score
-            formData.append('entry.2141778735', pillarScores.businessImpact.toString()); // Business Impact Score
-            formData.append('entry.454668559', responses.size || ''); // Company Size
-            formData.append('entry.1609927747', responses.phase || ''); // Business Phase
-            formData.append('entry.1031471426', (responses.challenges || []).join(', ')); // Challenges (comma-separated)
-            formData.append('entry.547311289', `Timestamp: ${new Date().toISOString()}, Total Questions Answered: ${Object.keys(responses).length}`); // Summary instead of raw JSON
+            // Create a clean summary of all responses
+            const responsesSummary = Object.keys(responses).map(key => {
+                return `${key}: ${responses[key]}`;
+            }).join(' | ');
             
-            // Submit to Google Form
+            const submissionData = {
+                'entry.1300327790': firstName,
+                'entry.499399112': email,
+                'entry.1389817547': String(pillarScores.overall),
+                'entry.712844336': String(pillarScores.leadership),
+                'entry.379965506': String(pillarScores.performance),
+                'entry.1423329043': String(pillarScores.talent),
+                'entry.2029081751': String(pillarScores.operational),
+                'entry.249721741': String(pillarScores.customer),
+                'entry.2051656793': String(pillarScores.scalable),
+                'entry.939533081': String(pillarScores.aiReadiness),
+                'entry.2141778735': String(pillarScores.businessImpact),
+                'entry.454668559': responses.size || 'Not specified',
+                'entry.1609927747': responses.phase || 'Not specified',
+                'entry.1031471426': Array.isArray(responses.challenges) ? responses.challenges.join(', ') : 'None selected',
+                'entry.547311289': responsesSummary // All actual responses in readable format
+            };
+            
+            // Create form submission using URLSearchParams for cleaner data
+            const params = new URLSearchParams();
+            Object.keys(submissionData).forEach(key => {
+                params.append(key, submissionData[key]);
+            });
+            
+            // Submit using fetch with URL encoding
             fetch('https://docs.google.com/forms/d/e/1FAIpQLSeYNEbJ4empE3OkNjZFaH_44a8TzJd6-zd_lzyqq-PdDtBjjg/formResponse', {
                 method: 'POST',
-                body: formData,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: params.toString(),
                 mode: 'no-cors'
             }).then(() => {
                 console.log('Data submitted to Google Form');
